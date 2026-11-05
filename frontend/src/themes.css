@@ -1,0 +1,168 @@
+/* Themed visual system: cards/green and columns/orange. Neutral source CSS is untouched. */
+html:is([data-theme="green"]){
+  --canvas:#e9efeb;--canvas-top:#e4ece6;--surface:#fff;--shell:#f8faf8;
+  --ambient-field:radial-gradient(ellipse at 82% 7%,#f4f8e8 0%,transparent 56%),radial-gradient(ellipse at 8% 35%,#dceee5 0%,transparent 58%);
+  --subtle:#eff4f0;--secondary:#58675f;--border:#dce5df;--text:#1c3026;
+  --strong:#193f30;--on-strong:#fff;--accent-ink:#2c5a40;--active:#dfece2;
+  --hover:#f2f7f3;--action-hover:#d4e9d9;--selection:#c0dfc9;--scrollbar:#87998d;
+  --success:#376048;--pending:#795319;--unknown:#635778;
+  --success-bg:#e9f3ec;--pending-bg:#fbf1df;--unknown-bg:#f0edf5;
+}
+html[data-theme="orange"]{
+  --column-account-height:64px;
+  --canvas:#f6f5f2;--canvas-top:#f7ece1;--surface:#fff;--shell:#fcfbf9;
+  --ambient-field:radial-gradient(ellipse at 82% 7%,#fff5dc 0%,transparent 56%),radial-gradient(ellipse at 8% 35%,#f8e7dc 0%,transparent 58%);
+  --subtle:#f3f0eb;--secondary:#655e56;--border:#e8e2da;--text:#292823;
+  --strong:#292b28;--on-strong:#fff;--accent-ink:#9a420f;--active:#ffead8;
+  --hover:#faf5ef;--action-hover:#f7ddc8;--selection:#fbd3b2;--scrollbar:#9c9387;
+  --success:#3f634a;--pending:#795319;--unknown:#635778;
+  --success-bg:#ebf3e9;--pending-bg:#fbf0dd;--unknown-bg:#f0edf5;
+}
+html:is([data-theme="green"],[data-theme="orange"]){color:var(--text);background:var(--canvas);color-scheme:light;accent-color:var(--strong);caret-color:var(--strong)}
+html:is([data-theme="green"],[data-theme="orange"]) ::selection{background:var(--selection);color:var(--text)}
+html:is([data-theme="green"],[data-theme="orange"]) .app-shell{background:var(--canvas)}
+html:is([data-theme="green"],[data-theme="orange"]) .sidebar{background:var(--shell);box-shadow:inset -1px 0 0 var(--border)}
+html:is([data-theme="green"],[data-theme="orange"]) .brand{font-size:24px;line-height:32px;letter-spacing:-.9px;font-weight:600;color:var(--text)}
+html:is([data-theme="green"],[data-theme="orange"]) .wallet-label{color:var(--secondary)}
+html:is([data-theme="green"],[data-theme="orange"]) nav{margin-top:20px;gap:4px}
+html:is([data-theme="green"],[data-theme="orange"]) .nav-item{border-radius:12px;font-weight:500;color:var(--secondary)}
+html:is([data-theme="green"],[data-theme="orange"]) .nav-item.active{background:var(--active);color:var(--text);font-weight:600}
+html:is([data-theme="green"],[data-theme="orange"]) .workspace{background-color:var(--canvas);background-image:var(--ambient-field);background-size:100% 760px;background-repeat:no-repeat}
+html:is([data-theme="green"],[data-theme="orange"]) .workspace>header{background:transparent;align-items:center;padding-inline:40px}
+html:is([data-theme="green"],[data-theme="orange"]) header .owner-name{width:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text)}
+html:is([data-theme="green"],[data-theme="orange"]) header .owner-avatar{display:flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:50%;background:var(--surface);font-size:11px;font-weight:600;color:var(--secondary)}
+html:is([data-theme="green"],[data-theme="orange"]) main{background:transparent;scrollbar-color:var(--scrollbar) var(--canvas)}
+html:is([data-theme="green"],[data-theme="orange"]) h1{font-size:34px;line-height:41px;letter-spacing:-1.1px;font-weight:500}
+html:is([data-theme="green"],[data-theme="orange"]) .account-group h2,
+html:is([data-theme="green"],[data-theme="orange"]) .column-account-group h2{font-size:16px;line-height:24px;font-weight:500;letter-spacing:-.25px}
+html:is([data-theme="green"],[data-theme="orange"]) .currency-code{font-weight:600;color:var(--text)}
+html:is([data-theme="green"],[data-theme="orange"]) .currency-name{font-weight:400;color:var(--secondary)}
+html:is([data-theme="green"],[data-theme="orange"]) .account-card,
+html:is([data-theme="green"],[data-theme="orange"]) .column-account{border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px rgb(255 255 255 / 90%),0 0 0 1px rgb(255 255 255 / 35%)}
+html:is([data-theme="green"],[data-theme="orange"]) .account-select{border-radius:16px}
+html:is([data-theme="green"],[data-theme="orange"]) .balance{font-size:22px;line-height:26px;font-weight:500;letter-spacing:-.6px;font-variant-numeric:tabular-nums}
+html:is([data-theme="green"],[data-theme="orange"]) .fiat .balance{font-size:26px;letter-spacing:-.8px}
+html:is([data-theme="green"],[data-theme="orange"]) .account-details{font-size:11px;position:relative}
+html:is([data-theme="green"],[data-theme="orange"]) .account-details::after{content:"";position:absolute;inset:-8px -3px}
+html:is([data-theme="green"],[data-theme="orange"]) .text-link{color:var(--accent-ink);text-underline-offset:3px}
+html:is([data-theme="green"],[data-theme="orange"]) .app-shell .text-link{opacity:.85;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-decoration-thickness:1px}
+html:is([data-theme="green"],[data-theme="orange"]) .app-shell .text-link:focus-visible{opacity:1}
+html:is([data-theme="green"],[data-theme="orange"]) .account-actions button{font-size:12px;font-weight:500}
+html:is([data-theme="green"],[data-theme="orange"]) .action-circle{background:var(--subtle)}
+/* Pulse light maps are preserved. Green uses the calmer jade adaptation
+   requested on 5 November; orange keeps the sampled Monthly Spend stops. */
+html[data-theme="green"]{
+  --pulse-ink:#183b20;
+  --pulse-rim:rgb(241 252 246 / 65%);
+  --pulse-field:radial-gradient(ellipse 24% 110% at 65% 80%,#b5e3cc 0%,rgb(181 227 204 / 0) 100%),radial-gradient(ellipse 67% 65% at 28% 0%,#bce5cf 0%,rgb(188 229 207 / 0) 100%),linear-gradient(100deg,#92ccb1 0%,#75b497 32%,#9ad9bc 67%,#6eaf93 94%);
+}
+html[data-theme="orange"]{
+  --pulse-ink:#49240d;
+  --pulse-rim:rgb(255 249 232 / 65%);
+  --pulse-field:radial-gradient(ellipse 35% 95% at 75% 94%,#feecb5 0%,rgb(254 236 181 / 0) 100%),radial-gradient(ellipse 58% 60% at 60% 0%,#eebd71 0%,rgb(238 189 113 / 0) 100%),linear-gradient(100deg,#f37f2b 0%,#f5a862 34%,#fae29f 72%,#f9c38f 100%);
+}
+html[data-theme="green"] .account-card.selected,
+html[data-theme="orange"] .column-selected-account,
+html[data-theme="orange"] .column-account.is-selected{
+  background:var(--pulse-field);
+  background-clip:padding-box;
+  box-shadow:inset 0 0 10px 2px var(--pulse-rim),inset 0 1px 2px rgb(255 255 255 / 60%);
+  color:var(--pulse-ink);
+  text-shadow:none;
+  border-color:transparent;
+  outline:none;
+}
+html[data-theme="green"] .account-card.selected :is(.currency-code,.currency-name,.text-link,.account-actions button),
+html[data-theme="orange"] .column-account.is-selected :is(.currency-code,.currency-name){color:var(--pulse-ink)}
+html[data-theme="green"] .account-card.selected .action-circle,
+html[data-theme="orange"] .column-action-circle{
+  background:linear-gradient(145deg,rgb(255 255 255 / 48%),rgb(255 255 255 / 28%));
+  box-shadow:inset 0 1px 2px rgb(255 255 255 / 58%),inset 0 -1px 2px rgb(255 255 255 / 16%);
+  border-radius:50%;
+}
+html[data-theme="green"] .account-card.selected .app-icon{filter:brightness(0);opacity:1}
+html:is([data-theme="green"],[data-theme="orange"]) .nav-item.active{
+  background:var(--pulse-field);color:var(--pulse-ink);
+  box-shadow:inset 0 0 6px 1px var(--pulse-rim),inset 0 1px 1px rgb(255 255 255 / 65%);
+}
+html:is([data-theme="green"],[data-theme="orange"]) .nav-item.active .app-icon{filter:brightness(0);opacity:1}
+html:is([data-theme="green"]) .layout-cards .account-card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-rows:17px 51px 26px;
+  gap:18px;
+  height:156px;
+  padding:12px;
+  border:1px solid transparent;
+}
+html:is([data-theme="green"]) .layout-cards .account-top{grid-row:1}
+html:is([data-theme="green"]) .layout-cards .account-actions{grid-row:2}
+html:is([data-theme="green"]) .layout-cards .balance{grid-row:3;display:flex;align-items:center;height:26px;line-height:26px;white-space:pre}
+html:is([data-theme="green"]) .layout-cards .crypto .balance{font-size:22px;letter-spacing:-.6px}
+html[data-theme="green"] .balance-unit{font-size:16px;letter-spacing:-.2px}
+html[data-theme="orange"] .column-operations{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:calc(4 * var(--column-account-height) + 3 * 8px) auto;align-content:start;gap:16px;padding-top:32px}
+html[data-theme="orange"] .column-selected-account{align-self:stretch;justify-content:space-between}
+html[data-theme="orange"] .column-history{grid-row:2;margin-top:0;gap:8px}
+html[data-theme="orange"] .column-history .history-title{align-items:flex-start;min-height:24px;height:24px}
+html[data-theme="orange"] .column-history .history-title .text-link{height:24px}
+html[data-theme="orange"] .column-history .history-title h2{line-height:24px}
+html[data-theme="orange"] .column-operations[data-account-selected="true"] .transaction-list{min-height:calc(5 * var(--column-account-height) + 4 * 8px)}
+html[data-theme="orange"] .column-operations[data-account-selected="false"]{grid-template-rows:auto;padding-top:0}
+html[data-theme="orange"] .column-operations[data-account-selected="false"] .column-history{grid-row:1}
+/* Balance is the focal point; compact account list is navigation into its context. */
+html[data-theme="orange"] .column-account-group .column-account-list{height:auto}
+html[data-theme="orange"] .column-account,
+html[data-theme="orange"] .column-account-group .column-account.is-selected{
+  height:var(--column-account-height);
+  flex:0 0 var(--column-account-height);
+  padding:8px 14px;
+  gap:4px;
+  border:1px solid transparent;
+  border-radius:14px;
+}
+
+html[data-theme="orange"] .column-account-label{font-size:12px}
+html[data-theme="orange"] .column-account-balance{font-size:20px;font-weight:500;letter-spacing:-.45px;font-variant-numeric:tabular-nums}
+html[data-theme="orange"] .column-selected-account{
+  padding:24px;border-radius:20px;gap:16px;
+  background:var(--pulse-field);
+  background-clip:padding-box;
+  box-shadow:inset 0 0 14px 2px var(--pulse-rim),inset 0 1px 2px rgb(255 255 255 / 60%);
+}
+html[data-theme="orange"] .column-selected-heading h2{color:var(--pulse-ink);font-size:16px;line-height:24px;font-weight:500;letter-spacing:-.2px}
+html[data-theme="orange"] .column-selected-heading .column-details{font-size:12px;color:var(--pulse-ink);line-height:20px}
+html[data-theme="orange"] .column-selected-balance{font-size:40px;line-height:50px;font-weight:500;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}
+html[data-theme="orange"] .column-selected-actions{gap:24px;justify-content:flex-start}
+html[data-theme="orange"] .column-selected-actions button{height:80px;flex:0 0 100px;flex-direction:column;justify-content:flex-start;gap:8px;padding:0;border-radius:0;background:none;color:var(--pulse-ink);box-shadow:none}
+html[data-theme="orange"] .column-action-circle{width:52px;height:52px;flex:none}
+html[data-theme="orange"] .column-selected-actions .app-icon{filter:brightness(0);opacity:1}
+html[data-theme="orange"] .column-action-label{font-size:14px;line-height:20px;height:auto;font-weight:500}
+/* Quiet financial ledger: amount first, metadata and status secondary. */
+html:is([data-theme="green"],[data-theme="orange"]) .history-title h2{font-size:18px;line-height:29px;letter-spacing:-.35px;font-weight:500}
+html:is([data-theme="green"],[data-theme="orange"]) .history-title .text-link{font-size:13px}
+html:is([data-theme="green"],[data-theme="orange"]) .transaction-list{border-color:rgb(255 255 255 / 90%);border-radius:18px;background:var(--surface);box-shadow:0 0 0 3px rgb(255 255 255 / 32%)}
+html:is([data-theme="green"],[data-theme="orange"]) .table-header{background:none;box-shadow:0 1px 0 var(--border);color:var(--secondary);font-weight:400}
+html:is([data-theme="green"],[data-theme="orange"]) .transaction-row{align-items:center;min-height:54px;border-radius:6px}
+html:is([data-theme="green"],[data-theme="orange"]) .transaction-row:not(:last-child){box-shadow:0 1px 0 var(--subtle)}
+html:is([data-theme="green"],[data-theme="orange"]) .operation-id{color:var(--secondary)}
+html:is([data-theme="green"],[data-theme="orange"]) .transaction-row .amount{font-weight:600;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+html:is([data-theme="green"],[data-theme="orange"]) .status-cell{font-size:12px;line-height:18px;font-weight:500}
+html:is([data-theme="green"],[data-theme="orange"]) .status-label{display:inline-block;padding:4px 8px;border-radius:6px}
+html:is([data-theme="green"],[data-theme="orange"]) .status-cell[data-status="completed"] .status-label{color:var(--success);background:var(--success-bg)}
+html:is([data-theme="green"],[data-theme="orange"]) .status-cell[data-status="pending"] .status-label{color:var(--pending);background:var(--pending-bg)}
+html:is([data-theme="green"],[data-theme="orange"]) .status-cell[data-status="unknown"] .status-label{color:var(--unknown);background:var(--unknown-bg)}
+html:is([data-theme="green"],[data-theme="orange"]) .empty-history{border-radius:12px}
+html:is([data-theme="green"],[data-theme="orange"]) .receiving-dialog{border-radius:20px;border-color:#fff;box-shadow:0 0 0 7px rgb(255 255 255 / 18%),0 0 0 8px rgb(255 255 255 / 58%)}
+html:is([data-theme="green"],[data-theme="orange"]) .receiving-header h2{font-size:26px;font-weight:500;letter-spacing:-.6px}
+html:is([data-theme="green"],[data-theme="orange"]) button:focus-visible{outline:2px solid var(--strong);outline-offset:3px}
+html[data-theme="orange"] .column-account.is-selected:focus-visible{outline:2px solid var(--strong);outline-offset:3px}
+@media(hover:hover) and (pointer:fine){
+ html:is([data-theme="green"],[data-theme="orange"]) .nav-item:hover,
+ html:is([data-theme="green"],[data-theme="orange"]) .transaction-row:hover{background:var(--hover)}
+ html:is([data-theme="green"],[data-theme="orange"]) .nav-item.active:hover{background:var(--active)}
+ html:is([data-theme="green"],[data-theme="orange"]) .nav-item.active:hover{background:var(--pulse-field)}
+ html[data-theme="green"] .account-actions button:hover .action-circle{background:rgb(255 255 255 / 58%)}
+ html[data-theme="orange"] .column-selected-actions button:hover{filter:brightness(1.02)}
+ html[data-theme="orange"] .column-selected-actions button:hover .column-action-circle{background:rgb(255 255 255 / 58%)}
+ html:is([data-theme="green"],[data-theme="orange"]) .app-shell .text-link:hover{opacity:1;text-decoration-color:currentColor;text-decoration-thickness:1px}
+}
