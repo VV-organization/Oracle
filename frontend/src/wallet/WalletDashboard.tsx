@@ -70,25 +70,30 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
   const root=shellRef.current;
   if(!root || !('IntersectionObserver' in window))return;
   const media=window.matchMedia('(prefers-reduced-motion: reduce)');
-  const targets=Array.from(root.querySelectorAll<HTMLElement>('.wallet-brand-block,.wallet-nav > .wallet-nav-item,.wallet-sidebar-bottom,.wallet-topbar,.wallet-page-heading,.wallet-group-heading,.wallet-account,.wallet-rail-account,.wallet-selected-panel,.wallet-section-heading,.wallet-ledger-head,.wallet-transaction,.wallet-empty'));
+  const targets=Array.from(root.querySelectorAll<HTMLElement>('.wallet-brand-block,.wallet-nav > .wallet-nav-item,.wallet-sidebar-bottom,.wallet-topbar,.wallet-page-heading,.wallet-group-heading,.wallet-account,.wallet-rail-account,.wallet-selected-panel,.wallet-panel-heading,.wallet-panel-balance,.wallet-actions > button,.wallet-section-heading,.wallet-ledger-surface,.wallet-ledger-head,.wallet-transaction,.wallet-empty'));
   const reveal=(node:HTMLElement)=>{node.dataset.walletReveal='visible';};
+  const settle=(node:HTMLElement)=>{node.dataset.walletReveal='settled';};
   const observer=new IntersectionObserver(entries=>{
    entries.forEach(entry=>{if(entry.isIntersecting){reveal(entry.target as HTMLElement);observer.unobserve(entry.target);}});
   },{threshold:0.08});
   targets.forEach(node=>{
-   if(media.matches){reveal(node);return;}
-   if(node.dataset.walletReveal==='visible')return;
+   if(media.matches){settle(node);return;}
+   if(node.dataset.walletReveal==='visible'||node.dataset.walletReveal==='settled')return;
    const siblings=targets.filter(other=>other.parentElement===node.parentElement);
    node.style.setProperty('--wallet-reveal-delay',`${Math.min(siblings.indexOf(node)*45,180)}ms`);
    node.dataset.walletReveal='pending';observer.observe(node);
   });
-  const reduce=()=>{if(media.matches){targets.forEach(reveal);observer.disconnect();}};
+  const reduce=()=>{if(media.matches){targets.forEach(settle);observer.disconnect();}};
   const focus=(event:FocusEvent)=>{
-   const node=(event.target as HTMLElement).closest<HTMLElement>('[data-wallet-reveal]');
-   if(node){reveal(node);observer.unobserve(node);}
+   let node=(event.target as HTMLElement).closest<HTMLElement>('[data-wallet-reveal]');
+   while(node){settle(node);observer.unobserve(node);node=node.parentElement?.closest<HTMLElement>('[data-wallet-reveal]')??null;}
   };
-  media.addEventListener('change',reduce);root.addEventListener('focusin',focus);
-  return ()=>{observer.disconnect();media.removeEventListener('change',reduce);root.removeEventListener('focusin',focus);};
+  const finish=(event:AnimationEvent)=>{
+   const node=event.target as HTMLElement;
+   if((event.animationName==='wallet-reveal'||event.animationName==='wallet-fade')&&node.dataset.walletReveal==='visible')settle(node);
+  };
+  media.addEventListener('change',reduce);root.addEventListener('focusin',focus);root.addEventListener('animationend',finish);
+  return ()=>{observer.disconnect();media.removeEventListener('change',reduce);root.removeEventListener('focusin',focus);root.removeEventListener('animationend',finish);};
  },[presentation,selected]);
  const menuRef=useRef<HTMLElement>(null);
  const menuToggleRef=useRef<HTMLButtonElement>(null);
@@ -128,7 +133,7 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
     <div className="wallet-page-heading"><div><h1>{w.title}</h1><p>{w.subtitle}</p></div><span className="wallet-account-count">{locale==='ru'?`${count('fiat')} валюты · ${count('crypto')} криптоактивов`:`${count('fiat')} currencies · ${count('crypto')} crypto assets`}</span></div>
     {presentation==='cards'?<><div className="wallet-account-groups">{(['fiat','crypto'] as const).map(kind=><section className={`wallet-group ${kind}`} key={kind} aria-labelledby={`wallet-${kind}`}><div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2><span>{String(count(kind)).padStart(2,'0')}</span></div><div className="wallet-card-grid">{dashboard.accounts.filter(a=>a.kind===kind).map(a=><AccountTile key={a.currency} account={a} locale={locale} selected={selected===a.currency} onSelect={()=>onSelect(a.currency)} onOpen={onOpen}/>)}</div></section>)}</div>{ledger}</>:
      <div className="wallet-columns" data-selected={Boolean(account)}><div className="wallet-account-rail">{(['fiat','crypto'] as const).map(kind=><section className={`wallet-rail-group ${kind}`} key={kind} aria-labelledby={`wallet-${kind}`}><div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2><span>{String(count(kind)).padStart(2,'0')}</span></div><div className="wallet-rail-list">{dashboard.accounts.filter(a=>a.kind===kind).map(a=><button className={`wallet-rail-account${selected===a.currency?' is-selected':''}`} key={a.currency} aria-label={`${t.selectedHistory} · ${a.currency}`} aria-pressed={selected===a.currency} onClick={()=>onSelect(a.currency)}><Identity account={a} locale={locale}/><span className="wallet-rail-balance"><Amount account={a} locale={locale}/></span></button>)}</div></section>)}</div>
-      <div className="wallet-detail-column">{account&&<section className="wallet-selected-panel"><div className="wallet-panel-heading"><Identity account={account} locale={locale}/><button className="wallet-link" onClick={()=>onOpen('receiving-details',account.currency)}>{account.kind==='fiat'?t.details:t.address}</button></div><div className="wallet-panel-balance"><span>{w.balance}</span><p><Amount account={account} locale={locale}/></p></div><Actions account={account} locale={locale} onOpen={onOpen}/></section>}{ledger}</div>
+      <div className="wallet-detail-column">{account&&<section className="wallet-selected-panel"><div className="wallet-panel-heading" key={`heading-${account.currency}`}><Identity account={account} locale={locale}/><button className="wallet-link" onClick={()=>onOpen('receiving-details',account.currency)}>{account.kind==='fiat'?t.details:t.address}</button></div><div className="wallet-panel-balance" key={`balance-${account.currency}`}><span>{w.balance}</span><p><Amount account={account} locale={locale}/></p></div><Actions key={account.currency} account={account} locale={locale} onOpen={onOpen}/></section>}{ledger}</div>
      </div>}
    </main>
   </div>

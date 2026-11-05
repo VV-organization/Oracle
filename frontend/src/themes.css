@@ -13,7 +13,7 @@ html[data-theme="orange"]{
   --canvas:#f6f5f2;--canvas-top:#f7ece1;--surface:#fff;--shell:#fcfbf9;
   --ambient-field:radial-gradient(ellipse at 82% 7%,#fff5dc 0%,transparent 56%),radial-gradient(ellipse at 8% 35%,#f8e7dc 0%,transparent 58%);
   --subtle:#f3f0eb;--secondary:#655e56;--border:#e8e2da;--text:#292823;
-  --strong:#292b28;--on-strong:#fff;--accent-ink:#9a420f;--active:#ffead8;
+  --strong:#49240d;--on-strong:#fff;--accent-ink:#9a420f;--active:#ffead8;
   --hover:#faf5ef;--action-hover:#f7ddc8;--selection:#fbd3b2;--scrollbar:#9c9387;
   --success:#3f634a;--pending:#795319;--unknown:#635778;
   --success-bg:#ebf3e9;--pending-bg:#fbf0dd;--unknown-bg:#f0edf5;

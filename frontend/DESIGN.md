@@ -1,3 +1,5 @@
+> Latest colour rule: decorative colours follow the active theme everywhere. Orange permits green only in explicit successful-status UI; incoming amounts/icons are theme accents. See WALLET-HOME-2026-11-05.md, Theme isolation. This overrides historical mixed-theme or palette notes below.
+
 > Active variants: green/cards and orange/columns only. Mixed was rejected and removed on 5 November 2026; mentions below are historical.
 
 > Current themed Home: see [5 November visual redesign](WALLET-HOME-2026-11-05.md). The notes below describe the preceding implementation; neutral Figma geometry remains preserved separately.
