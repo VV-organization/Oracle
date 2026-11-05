@@ -1,0 +1,129 @@
+[
+  {
+    "name": "home",
+    "source": "Building/JSON/Home_1_lottie.json",
+    "sha256": "a2d886b1893a3c2d79a8b1bcb4d3f7e47af9c356da5a9b907f2608ae34114cf8",
+    "width": 128,
+    "height": 128,
+    "frames": 52.0000021180034,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "554b62863e0ac1ab96bd1ed2d0644c070abf42812cc2c6078fa084afdefcafaa"
+  },
+  {
+    "name": "payments",
+    "source": "Arrows/JSON/exchange_lottie.json",
+    "sha256": "5fb1cc0a990005b81b143bc221b12f1a4d9f3e09902a0ecdac23c75361f3bc49",
+    "width": 128,
+    "height": 128,
+    "frames": 50.0000020365418,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "02f2c0ed05328186774baf7f84c2d19e989fb8379f2e2ce4b44e1931c5104cdf"
+  },
+  {
+    "name": "history",
+    "source": "File & Folder/JSON/receipt_lottie.json",
+    "sha256": "6a86e9e85ba1a935f7e5f9c30a01f2e1b3e4cc19597c45ff8901366da6c29b63",
+    "width": 128,
+    "height": 128,
+    "frames": 62.0000025253118,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "c38dbd2f91ab2751b3a66694a3e8a76677fd9dc489e89564fd3f2e3c8af44664"
+  },
+  {
+    "name": "help",
+    "source": "Multimedia/JSON/headphones_lottie.json",
+    "sha256": "6e236c510f7aee8d345fe8bab4d308881d6cbf181e60fc530bf52e12c84a675c",
+    "width": 128,
+    "height": 128,
+    "frames": 68.0000027696968,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "3da03231a9d88f872c6e23d3003490d44e97dbd36d6a4f15b3563d7db674a9aa"
+  },
+  {
+    "name": "settings",
+    "source": "General/JSON/Setting_lottie.json",
+    "sha256": "097dcd394d66335fa2d50912db39afd6c8e4c4849f69c28d286d16e619dedc40",
+    "width": 128,
+    "height": 128,
+    "frames": 71.0000028918893,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "c1df89822e5421412273382e8e96ef587672253139cfe44cc3004ac85c605d99"
+  },
+  {
+    "name": "logout",
+    "source": "General/JSON/log_out_lottie.json",
+    "sha256": "d283c0ba4be937b0d9d34dc0b8dd380bf8183a1e3f9e1db56f1ccdfd86293510",
+    "width": 128,
+    "height": 128,
+    "frames": 63.0000025660426,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "86bb58b7237771e1224378f16d9390e0895b2ad98c67284cb65d413915e912c5"
+  },
+  {
+    "name": "transfer",
+    "source": "Arrows/JSON/arrow_right_Up_lottie.json",
+    "sha256": "d228d866fbbc9ea2d73ca72124acc30cf75b415bd8ce11ec918bbece3f1ecf20",
+    "width": 128,
+    "height": 128,
+    "frames": 32.0000013033867,
+    "fps": 29.9700012207031,
+    "restFrame": 18,
+    "staticSha256": "1cdd802e8d32cefcc2a28d932173952e80aece098f214805bf9a3ebf91b303cc",
+    "sourceSha256": "d228d866fbbc9ea2d73ca72124acc30cf75b415bd8ce11ec918bbece3f1ecf20",
+    "viewBox": "39.818739 29.095132 59.086135 59.086135",
+    "adaptation": "User requested 2026-11-05: same optical extent (75% of icon slot) and stroke. Plus: remove circle shapes, retain parent animation, normalize stroke. Transfer: center visible frame18."
+  },
+  {
+    "name": "plus",
+    "source": "General/JSON/Add_Circle_lottie.json",
+    "sha256": "fa803eb40fac3731eb65df77f47cdae023f3d8296cd17b84b94ebf8b7b08a2d4",
+    "width": 128,
+    "height": 128,
+    "frames": 50.0000020365418,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "0db2175aff630fb0229356fb93eef1afba5bdd162bb2dfc4dd389489b4bf3609",
+    "sourceSha256": "48ad4d18ca03c36ba6d44501d106bcfa82227a7ee65ea9b42cb5b1e82125d1e8",
+    "viewBox": "36.684111 36.684111 54.631778 54.631778",
+    "adaptation": "User requested 2026-11-05: same optical extent (75% of icon slot) and stroke. Plus: remove circle shapes, retain parent animation, normalize stroke. Transfer: center visible frame18."
+  },
+  {
+    "name": "cards",
+    "source": "General/JSON/Coupon_lottie.json",
+    "sha256": "76165c74cf9fd2efacb95ba791d654f9a6b4d3aa2da44deb1b1a078de21809d7",
+    "width": 128,
+    "height": 128,
+    "frames": 79.000003217736,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "894fbf626b6c3adda4ce4e0e09bb24121503926f8cfe858947b9faad3f97ad14"
+  },
+  {
+    "name": "close",
+    "source": "General/JSON/Close_Circle_lottie.json",
+    "sha256": "ac53b67a764000930989bf0ab520f6dfddc538cd728b41f5e876e5ccd04cef0a",
+    "width": 128,
+    "height": 128,
+    "frames": 48.0000019550801,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "eb1d05cb8cdbb86ad95c5feabea0c3e3f1023ba7622df34645b871b9afd15a42"
+  },
+  {
+    "name": "copy",
+    "source": "General/JSON/copy_1_lottie.json",
+    "sha256": "a8b01c4dc2a485af854be8983c5e5f499be335c31d663906a048ae152876ea06",
+    "width": 128,
+    "height": 128,
+    "frames": 65.0000026475043,
+    "fps": 29.9700012207031,
+    "restFrame": 0,
+    "staticSha256": "28c120288e582793865e253050d32fa240a0294e1d66cf2b10d69ee994512cac"
+  }
+]
