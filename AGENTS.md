@@ -1,3 +1,10 @@
+- Account-card spacing and hierarchy (5 November 2026): fiat and crypto cards have equal importance. In the cards layout, use the same responsive amount and currency-unit typography for both groups, 12px padding on every edge at every breakpoint, top-aligned identity/requisites and bottom-anchored amounts. Let remaining interior space flex around the actions; do not shrink crypto amounts independently. Preserve full numeric precision and verify the longest balance at breakpoint boundaries.
+
+# Local palette and action refinement — 5 November 2026
+
+- Latest approved scope: transfer only colours and the recent-activity filter styling from the two static concepts; preserve the current layouts, typography, content and behaviour.
+- Orange selected-panel actions are two equal-width milky translucent pill buttons with icon before label, a16px gap and the existing32px panel inset. This supersedes the older separate-circle/label-below rule for this panel. Keep the mobile cards presentation and green card actions unchanged.
+
 # Theme isolation — latest rule, 5 November 2026
 
 - Support ONLY green/cards and orange/columns; mixed is retired. This supersedes older mixed-theme notes below.
@@ -54,6 +61,8 @@
 - Proactively use the globally installed `impeccable`, `emil-design-eng`, `humanizer` and `ui-ux-pro-max` skills when relevant to the current task, without separate reminders. Read the selected skill's current `SKILL.md` under `~/.codex/skills/` and apply it to the concrete task; do not load all four indiscriminately. Project requirements and the user's agreed direction take precedence over generic skill recommendations.
 
 # OraclePay UX requirements
+
+- Local review only (5 November 2026): propose and implement further changes locally for user review. Do not commit, push, deploy, or publish them without a new explicit user request. Earlier commit/push requests do not authorize later iterations.
 
 - In every OraclePay task, use subagents: the main agent coordinates and owns the final result, and at least one subagent independently checks it. For large tasks, separate research, product logic, and UX/UI audit; for small tasks, request a brief focused check. Only one executor may edit a shared Figma file.
 

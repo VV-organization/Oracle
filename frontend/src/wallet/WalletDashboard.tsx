@@ -4,6 +4,7 @@ import type { Account, Currency, Dashboard, Operation } from '../domain';
 import { filterOperations, formatAmount } from '../domain';
 import { catalogs, type Locale } from '../locales';
 import { Icon } from '../components/Icon';
+import { BrandLogo } from '../components/BrandLogo';
 import './wallet.css';
 import { walletCopy as words } from './copy';
 
@@ -97,8 +98,11 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
  },[presentation,selected]);
  const menuRef=useRef<HTMLElement>(null);
  const menuToggleRef=useRef<HTMLButtonElement>(null);
+ useEffect(()=>{if(!compact)setMenuOpen(false);},[compact]);
  useEffect(()=>{
-  if(!menuOpen)return;
+  if(!menuOpen||!compact)return;
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow='hidden';
   const menu=menuRef.current;
   const items=()=>Array.from(menu?.querySelectorAll<HTMLButtonElement>('button')??[]);
   items()[0]?.focus();
@@ -111,8 +115,13 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
    }
   };
   document.addEventListener('keydown',closeOnEscape);
-  return ()=>{document.removeEventListener('keydown',closeOnEscape);menuToggleRef.current?.focus();};
- },[menuOpen]);
+  return ()=>{
+   document.removeEventListener('keydown',closeOnEscape);
+   document.body.style.overflow=previousOverflow;
+   if(getCompact())menuToggleRef.current?.focus();
+   else menuRef.current?.querySelector<HTMLButtonElement>('[aria-current="page"]')?.focus();
+  };
+ },[menuOpen,compact]);
  const count=(kind:'fiat'|'crypto')=>dashboard.accounts.filter(a=>a.kind===kind).length;
  const account=dashboard.accounts.find(item=>item.currency===selected);
  const operations=filterOperations(dashboard.operations,selected).slice(0,4);
@@ -121,13 +130,13 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
  function changeLocale(next:Locale){const url=new URL(location.href);url.searchParams.set('lang',next);location.assign(url.href);}
  return <div ref={shellRef} className={`wallet-shell wallet-layout-${presentation}`}>
   <aside ref={menuRef} id="wallet-navigation" className={`wallet-sidebar${menuOpen?' is-open':''}`}>
-   <div className="wallet-brand-block"><p className="wallet-brand">Oracle<span>Pay</span></p><p>{t.wallet}</p></div>
+   <div className="wallet-brand-block"><BrandLogo className="wallet-brand" /><p>{t.wallet}</p></div>
    <button className="wallet-mobile-close" onClick={()=>setMenuOpen(false)} aria-label={w.closeMenu}><Icon name="close"/></button>
    <nav className="wallet-nav" aria-label={locale==='ru'?'Основная навигация':'Main navigation'}>{nav.map((item,index)=><button className={`wallet-nav-item${item==='home'?' active':''}${index===4?' wallet-nav-secondary':''}`} key={item} aria-current={item==='home'?'page':undefined} onClick={()=>go(item)}><Icon name={item} size={19}/><span>{t[item]}</span></button>)}</nav>
    <div className="wallet-sidebar-bottom"><div className="wallet-languages" role="group" aria-label={w.language}>{(['ru','en'] as const).map(lang=><button key={lang} aria-pressed={locale===lang} onClick={()=>changeLocale(lang)}>{lang.toUpperCase()}</button>)}</div><button className="wallet-nav-item" onClick={()=>onOpen('logout')}><Icon name="logout" size={19}/><span>{t.logout}</span></button></div>
   </aside>
   {menuOpen&&<button className="wallet-menu-shade" aria-label={w.closeMenu} onClick={()=>setMenuOpen(false)}/>}
-  <div className="wallet-workspace" inert={menuOpen}>
+  <div className="wallet-workspace" inert={menuOpen&&compact}>
    <header className="wallet-topbar"><button ref={menuToggleRef} aria-controls="wallet-navigation" className="wallet-menu-toggle" aria-expanded={menuOpen} onClick={()=>setMenuOpen(!menuOpen)}>{w.menu}</button><span className="wallet-location">{t.home}<span>/</span>{w.overview}</span><span className="wallet-owner"><span className="wallet-avatar" aria-hidden="true">{dashboard.owner.split(' ').map(s=>s[0]).slice(0,2).join('')}</span><span>{dashboard.owner}</span></span></header>
    <main className="wallet-main">
     <div className="wallet-page-heading"><div><h1>{w.title}</h1><p>{w.subtitle}</p></div><span className="wallet-account-count">{locale==='ru'?`${count('fiat')} валюты · ${count('crypto')} криптоактивов`:`${count('fiat')} currencies · ${count('crypto')} crypto assets`}</span></div>

@@ -1,19 +1,19 @@
 /* Themed visual system: cards/green and columns/orange. Neutral source CSS is untouched. */
 html:is([data-theme="green"]){
-  --canvas:#e9efeb;--canvas-top:#e4ece6;--surface:#fff;--shell:#f8faf8;
+  --canvas:#f8f9f8;--canvas-top:#f8f9f8;--surface:#fff;--shell:#fff;
   --ambient-field:radial-gradient(ellipse at 82% 7%,#f4f8e8 0%,transparent 56%),radial-gradient(ellipse at 8% 35%,#dceee5 0%,transparent 58%);
   --subtle:#eff4f0;--secondary:#58675f;--border:#dce5df;--text:#1c3026;
-  --strong:#193f30;--on-strong:#fff;--accent-ink:#2c5a40;--active:#dfece2;
+  --strong:#124434;--on-strong:#fff;--accent-ink:#17533e;--active:#e2f3ea;
   --hover:#f2f7f3;--action-hover:#d4e9d9;--selection:#c0dfc9;--scrollbar:#87998d;
   --success:#376048;--pending:#795319;--unknown:#635778;
   --success-bg:#e9f3ec;--pending-bg:#fbf1df;--unknown-bg:#f0edf5;
 }
 html[data-theme="orange"]{
   --column-account-height:64px;
-  --canvas:#f6f5f2;--canvas-top:#f7ece1;--surface:#fff;--shell:#fcfbf9;
+  --canvas:#f6f5f2;--canvas-top:#f6f5f2;--surface:#fff;--shell:#fff;
   --ambient-field:radial-gradient(ellipse at 82% 7%,#fff5dc 0%,transparent 56%),radial-gradient(ellipse at 8% 35%,#f8e7dc 0%,transparent 58%);
   --subtle:#f3f0eb;--secondary:#655e56;--border:#e8e2da;--text:#292823;
-  --strong:#49240d;--on-strong:#fff;--accent-ink:#9a420f;--active:#ffead8;
+  --strong:#49240d;--on-strong:#fff;--accent-ink:#a44709;--active:#ffead0;
   --hover:#faf5ef;--action-hover:#f7ddc8;--selection:#fbd3b2;--scrollbar:#9c9387;
   --success:#3f634a;--pending:#795319;--unknown:#635778;
   --success-bg:#ebf3e9;--pending-bg:#fbf0dd;--unknown-bg:#f0edf5;
@@ -49,17 +49,17 @@ html:is([data-theme="green"],[data-theme="orange"]) .app-shell .text-link{opacit
 html:is([data-theme="green"],[data-theme="orange"]) .app-shell .text-link:focus-visible{opacity:1}
 html:is([data-theme="green"],[data-theme="orange"]) .account-actions button{font-size:12px;font-weight:500}
 html:is([data-theme="green"],[data-theme="orange"]) .action-circle{background:var(--subtle)}
-/* Pulse light maps are preserved. Green uses the calmer jade adaptation
-   requested on 5 November; orange keeps the sampled Monthly Spend stops. */
+/* Palette adapted from the two reviewed static concepts (5 November).
+   Keep the soft luminous material; these are not exact Pulse source samples. */
 html[data-theme="green"]{
-  --pulse-ink:#183b20;
+  --pulse-ink:#123c2c;
   --pulse-rim:rgb(241 252 246 / 65%);
-  --pulse-field:radial-gradient(ellipse 24% 110% at 65% 80%,#b5e3cc 0%,rgb(181 227 204 / 0) 100%),radial-gradient(ellipse 67% 65% at 28% 0%,#bce5cf 0%,rgb(188 229 207 / 0) 100%),linear-gradient(100deg,#92ccb1 0%,#75b497 32%,#9ad9bc 67%,#6eaf93 94%);
+  --pulse-field:radial-gradient(ellipse 65% 85% at 88% 6%,#e5f5ed 0%,rgb(229 245 237 / 0) 100%),radial-gradient(ellipse 65% 90% at 76% 92%,#b5dfbf 0%,rgb(181 223 191 / 0) 100%),linear-gradient(145deg,#bfe3d0 0%,#c6e7d7 38%,#81b9a6 100%);
 }
 html[data-theme="orange"]{
   --pulse-ink:#49240d;
   --pulse-rim:rgb(255 249 232 / 65%);
-  --pulse-field:radial-gradient(ellipse 35% 95% at 75% 94%,#feecb5 0%,rgb(254 236 181 / 0) 100%),radial-gradient(ellipse 58% 60% at 60% 0%,#eebd71 0%,rgb(238 189 113 / 0) 100%),linear-gradient(100deg,#f37f2b 0%,#f5a862 34%,#fae29f 72%,#f9c38f 100%);
+  --pulse-field:radial-gradient(ellipse 70% 100% at 98% 100%,#fff7a4 0%,rgb(255 247 164 / 0) 100%),radial-gradient(ellipse 50% 95% at 52% 100%,#ffdf9e 0%,rgb(255 223 158 / 0) 100%),linear-gradient(120deg,#ff913f 0%,#ffad55 43%,#ffda87 100%);
 }
 html[data-theme="green"] .account-card.selected,
 html[data-theme="orange"] .column-selected-account,

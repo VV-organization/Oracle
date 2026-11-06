@@ -26,3 +26,15 @@
 @media(hover:hover) and (pointer:fine){.receiving-icon-button:hover{background:var(--subtle)}.receiving-primary:hover{filter:brightness(1.12)}}
 /* Dialog remains usable on narrow windows; the desktop product layout is unchanged. */
 @media(max-width:600px){.receiving-dialog{padding:20px}.receiving-header h2{font-size:24px;line-height:32px}.receiving-bank-row{flex-wrap:wrap;gap:6px 12px}.receiving-label{width:100%}.receiving-value{flex-basis:45%}.receiving-copy-feedback{width:75px}.receiving-footer{flex-wrap:wrap}.receiving-primary{width:100%}.receiving-network>span:first-child{width:130px}.receiving-address-row{flex-wrap:wrap}.receiving-address-row>p{flex-basis:100%}.receiving-address-row .receiving-copy-feedback{flex:1}}
+
+@media(max-width:600px){
+ .receiving-bank-row{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px 12px;align-items:center}
+ .receiving-label{grid-column:1 / -1;width:auto}
+ .receiving-value{grid-column:1;grid-row:2}
+ .receiving-bank-row:not(:has(.receiving-icon-button)) .receiving-value{grid-column:1 / -1}
+ .receiving-bank-row .receiving-icon-button{grid-column:2;grid-row:2}
+ .receiving-bank-row .receiving-copy-feedback{grid-column:1 / -1;grid-row:3;width:auto}
+ .receiving-network{align-items:flex-start;flex-wrap:wrap;gap:4px 12px}
+ .receiving-network>span:first-child{width:100%}
+ .receiving-primary{white-space:normal;min-height:44px;height:auto;padding-block:10px}
+}
