@@ -2,6 +2,37 @@
 
 Status: local review candidate. This is the active themed Home implementation; the earlier neutral Figma baseline remains separate. No other screen was migrated in this pass.
 
+## Local composition refinement — 6 November 2026
+
+Rollback checkpoint: `0a2f56c`, pushed to `codex/dashboard-neutral` before this iteration. The changes below are local only; standalone `Oracle/green` and `Oracle/orange` exports remain at the checkpoint.
+
+Applied the reference audit to composition: removed the repeated introduction and account counts, reduced the page-title scale, tightened section spacing, and made supporting labels and contextual actions more legible. Retained the approved palette, logo, account behaviour and receiving links. Fiat and crypto amounts share one size rule and preserve full precision. Desktop green history starts 80px earlier at 1440px; orange panel/fiat and history/crypto bounds remain aligned.
+
+At widths up to 600px, each account group is a horizontal rail with a visible next-card edge, position counter and 44px navigation controls. This keeps large amounts and brings history directly after the two groups. Tradeoff: balances are no longer all visible simultaneously on a phone. Selection reveals its card; keyboard navigation moves focus without selecting; ordinary scrolling does not change the history filter. Reduced motion uses instant navigation.
+
+Verification: production build, four existing tests and diff checks pass. Browser geometry checked at 320, 390, 600, 768, 1024, 1280, 1440 and 1920px for the supported themes, including English orange labels: no page overflow or clipped amounts in the checked states; statuses remain single-line. Checked desktop XRP selection → phone visibility, keyboard rail navigation without accidental selection, receiving-address dialog and Escape, mobile menu and Escape. Independent agent reviewed code and orange desktop screenshot; its selected-card and keyboard-focus findings were fixed and checked in-browser. Impeccable detector reports only the existing Inter font warning; retained intentionally. No independent user usability test or physical-device test was conducted. Tablet grids remain multi-row. Money-transfer integrations remain outside this Home-only iteration.
+
+Evidence: `qa/refinement-green-desktop.png`, `qa/refinement-orange-desktop.png`, `qa/refinement-green-mobile.png`, `qa/refinement-orange-mobile.png`.
+
+## Operation semantics — 6 November 2026 (current)
+
+Both local variants share **exactly four status states**, independent of the theme. This overrides the historical Theme isolation section's prohibition on green incoming amounts. Names, dates, direction-icon backgrounds and ordinary amounts use neutral ink; the account cards and other decorative accents retain their own theme.
+
+| State | Meaning and RU / EN label | Colour token |
+| --- | --- | --- |
+| `completed` | Confirmed completion: «Зачислено» / Credited for incoming, «Выполнена» / Completed for outgoing | `--operation-success: #23734b` |
+| `pending` | Known processing: «В обработке» / Processing for fiat; «Ожидаем подтверждения сети» / Awaiting network confirmation for crypto | `--operation-pending: #956313` |
+| `unknown` | Result not yet established: «Уточняем статус» / Checking status; not a failure | `--operation-muted: #626a72` |
+| `failed` | Explicitly confirmed non-completion: «Не выполнена» / Failed; no invented failure reason | `--operation-error: #b43636` |
+
+Amount rules: completed receiving/funding = green `+`; completed outbound transfer = neutral `−` (`--operation-ink: #292d32`). Pending/unknown/failed amounts stay neutral without a sign implying settled movement. Currency units inherit green only for confirmed credits. The arrow communicates direction; the text communicates status. Ordinary spending is not an error and is not red. Retain full decimal precision and one-line status labels.
+
+`operationPresentation` derives these rules from `kind` and `status`, not the legacy `positive` fixture field. In the present domain, `transfer` is outbound and `receiving`/`funding` are inbound; a future backend adapter must supply explicit direction if transfer types expand. Do not claim that every inbound operation is successful. Failed is supported in the type/catalog/styles/tests; no existing record was changed into a fictional failure.
+
+Reference evidence: the user's Alfa-Online screenshot has green incoming + and neutral outgoing − amounts. [T-Bank's official transfer help](https://www.tbank.ru/bank/help/payments/transfers/russia/about/) distinguishes processing with a status and clock, rather than treating it as completion. These observations inform our system; this is not a claim that every bank uses these exact four states or colours.
+
+Verification for operation semantics: both active Home variants inspected at1440px and390px, including RU orange/EUR unknown and EN green/USDC pending; no document overflow or wrapped statuses in these states. Rendered computed colours matched the shared tokens. Pointer account switching preserved filtering/signs. All five text colours have white-background contrast ≥5.16:1. Six tests and production build pass; independent source/cascade review found no blocking issue. Failed has no current fixture record, so its data rule is unit-tested rather than demonstrated in live history. Historical neutral baseline remains unchanged. Evidence: `qa/operations-green.png`, `qa/operations-orange.png`. Local only; no commit, push or standalone export.
+
 ## User direction
 
 The user rejected the colored wireframe and authorized careful composition changes on Home, real reference-led visual decisions, and entrance motion. Preserve financial data, account-context actions, filtering, receiving dialogs and Iconity. This direction is not a claim of Figma 1:1 geometry or final design approval.

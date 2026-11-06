@@ -14,6 +14,10 @@ import { WalletDashboard } from './wallet/WalletDashboard';
 import { ColumnDashboard } from './ColumnDashboard';
 import { Icon } from './components/Icon';
 import { ReceivingDialog } from './components/ReceivingDialog';
+import { PreviewApp } from './auth/PreviewApp';
+import { actionAllowed, dashboardForSession, moneyAllowed, type AccountSession } from './auth/account';
+import { AccountRestriction, accountCopy } from './auth/AccountRestriction';
+import { MoneyAccessContext, useMoneyAccess } from './auth/AccessContext';
 import './styles.css';
 import './themes.css';
 
@@ -36,13 +40,14 @@ function openDependency(action: string, currency?: Currency) {
   // Temporary development boundary. No invented destination or simulated payment.
 }
 function AccountCard({account, selected, onSelect}: {account:Account; selected:boolean; onSelect:()=>void}) {
+  const allowed = useMoneyAccess();
   return <article className={`account-card${selected ? ' selected' : ''}`} data-node-id={layout==='cards'?compactCardNodes[account.currency]:account.nodeId} data-currency={account.currency}>
     <button className="account-select" aria-label={`${t.selectedHistory} · ${account.currency}`} aria-pressed={selected} onClick={onSelect}/>
     <div className="account-top"><span className="account-currency"><span className="currency-code">{account.currency}</span><span className="currency-name"> · {t.currency[account.currency]}</span></span>
       <button className="text-link account-details" onClick={()=>openDependency('receiving-details', account.currency)}>{account.kind === 'fiat' ? t.details : t.address}</button>
     </div>
     {layout==='baseline' && <p className="balance">{formatAmount(account.units,account.decimals,account.currency,locale)}</p>}
-    {(layout==='baseline'||selected) && <div className="account-actions">
+    {allowed && (layout==='baseline'||selected) && <div className="account-actions">
       {(['fund','transfer'] as const).map(action=><button key={action} onClick={()=>openDependency(action,account.currency)} aria-label={`${t[action]} · ${account.currency}`}>
         <span className="action-circle"><Icon name={action==='fund'?'plus':'transfer'} size={layout==='cards'?16:24}/></span><span>{t[action]}</span>
       </button>)}
@@ -71,7 +76,9 @@ function TransactionList({operations}: {operations:Operation[]}) {
     </button>) : <div className="empty-history" role="status"><strong>{t.empty}</strong><p>{t.emptyHelp}</p></div>}
   </div>;
 }
-function App({dashboard}: {dashboard:Dashboard}) {
+function App({dashboard,onLogout,session}: {dashboard:Dashboard;onLogout:()=>void;session:AccountSession|null}) {
+  const registration = session?.kind === 'local-registered' ? session.account : null;
+  const restriction = registration ? <AccountRestriction account={registration} locale={locale}/> : null;
   const [selected,setSelected] = useState<Currency|null>(layout==='baseline'?null:'USDC');
   const [outlined,setOutlined] = useState<Currency|null>(layout==='baseline'?null:'USDC');
   const [notice,setNotice] = useState('');
@@ -81,27 +88,28 @@ function App({dashboard}: {dashboard:Dashboard}) {
     const showBoundary = (event:Event)=>{
       const {action,currency}=(event as CustomEvent<{action:string;currency?:Currency}>).detail;
       clearTimeout(timer);
+      if (!actionAllowed(session, action)) { setNotice(accountCopy[locale].blocked); timer=setTimeout(()=>setNotice(''),6000); return; }
       if(action==='receiving-details'&&currency){setNotice('');setReceiving(currency);return;}
       setNotice(t.boundary);timer=setTimeout(()=>setNotice(''),6000);
     };
     window.addEventListener('oraclepay:open-transition',showBoundary);
     return ()=>{clearTimeout(timer);window.removeEventListener('oraclepay:open-transition',showBoundary);};
-  },[]);
+  },[session]);
   const selectAccount = (currency:Currency)=>{const next=toggleAccount(selected,currency);setSelected(next);setOutlined(next);};
   const history = <><div className="history-title" data-node-id="2723:1810"><h2>{selected?(layout==='baseline'?`${t.selectedHistory} · ${selected}`:`${t.selectedRecent} ${selected} · ${t.currency[selected]}`):t.recent}</h2><button className="text-link" onClick={()=>openDependency('history',selected??undefined)}>{t.allHistory}</button></div><TransactionList operations={filterOperations(dashboard.operations,selected).slice(0,4)}/></>;
   if(theme!=='neutral') return <>
-    <WalletDashboard dashboard={dashboard} locale={locale} layout={layout==='columns'?'columns':'cards'} selected={selected} onSelect={selectAccount} onReset={()=>{setSelected(null);setOutlined(null);}} onOpen={openDependency}/>
+    <WalletDashboard accountType={registration?.type} restriction={restriction} dashboard={dashboard} locale={locale} layout={layout==='columns'?'columns':'cards'} selected={selected} onSelect={selectAccount} onReset={()=>{setSelected(null);setOutlined(null);}} onOpen={(action,currency)=>action==='logout'?onLogout():openDependency(action,currency)}/>
     <div className={`build-notice${notice?' visible':''}`} role="status">{notice}</div>
-    {receiving&&<ReceivingDialog key={receiving} currency={receiving} owner={dashboard.owner} locale={locale} onDismiss={()=>setReceiving(null)}/>}
+    {receiving&&<ReceivingDialog key={receiving} issued={moneyAllowed(session)} currency={receiving} owner={dashboard.owner} locale={locale} onDismiss={()=>setReceiving(null)}/>}
   </>;
   return <div className={`app-shell layout-${layout}`} data-node-id={layout==='cards'?'2723:1823':layout==='columns'?'2716:872':'34:262'}>
     <aside className="sidebar" data-node-id="80:489">
-      <p className="brand">OraclePay</p><p className="wallet-label">{t.wallet}</p>
+      <p className="brand">OraclePay</p><p className="wallet-label">{registration?.type === 'business' ? t.businessWallet : t.wallet}</p>
       <nav aria-label={locale==='ru'?'Основная навигация':'Main navigation'}>{navigation.map(item=><button key={item} className={`nav-item ${item==='home'?'active':''}`} aria-current={item==='home'?'page':undefined} onClick={()=>item==='home'?(setSelected(null),setOutlined(null)):openDependency(item)}><Icon name={item}/><span>{t[item]}</span></button>)}</nav>
-      <button className="nav-item signout" onClick={()=>openDependency('logout')}><Icon name="logout"/><span>{t.logout}</span></button>
+      <button className="nav-item signout" onClick={onLogout}><Icon name="logout"/><span>{t.logout}</span></button>
     </aside>
     <div className="workspace" data-node-id="80:509"><header data-node-id="80:510"><span className="owner-name"><span className="owner-avatar" aria-hidden="true">{dashboard.owner.split(' ').map(part=>part[0]).slice(0,2).join('')}</span>{dashboard.owner}</span></header>
-      <main data-node-id="80:513"><h1 data-node-id="80:520">{t.home}</h1>
+      <main data-node-id="80:513">{restriction}<h1 data-node-id="80:520">{t.home}</h1>
         {layout==='columns'?<ColumnDashboard dashboard={dashboard} selected={selected} onSelect={selectAccount} onOpen={openDependency} history={history} locale={locale}/>:<><div className="accounts" data-node-id="2709:853">
           {(['fiat','crypto'] as const).map(kind=><section key={kind} className="account-group" aria-labelledby={`${kind}-heading`}><h2 id={`${kind}-heading`}>{kind==='fiat'?t.money:t.crypto}</h2><div className={`account-grid ${kind}`}>
             {dashboard.accounts.filter(a=>a.kind===kind).map(account=><AccountCard key={account.currency} account={account} selected={account.currency===outlined} onSelect={()=>selectAccount(account.currency)}/>)}
@@ -111,8 +119,8 @@ function App({dashboard}: {dashboard:Dashboard}) {
       </main>
     </div>
     <div className={`build-notice${notice?' visible':''}`} role="status">{notice}</div>
-    {receiving&&<ReceivingDialog key={receiving} currency={receiving} owner={dashboard.owner} locale={locale} onDismiss={()=>setReceiving(null)}/>}
+    {receiving&&<ReceivingDialog key={receiving} issued={moneyAllowed(session)} currency={receiving} owner={dashboard.owner} locale={locale} onDismiss={()=>setReceiving(null)}/>}
   </div>;
 }
 const dashboard = await mockDashboardService.getDashboard({sourceOnly:layout==='baseline'});
-createRoot(document.getElementById('root')!).render(<StrictMode><App dashboard={dashboard}/></StrictMode>);
+createRoot(document.getElementById('root')!).render(<StrictMode><PreviewApp locale={locale} renderHome={(onLogout,session)=><MoneyAccessContext.Provider value={moneyAllowed(session)}><App key={session?.kind === 'local-registered' ? session.account.id : 'preview'} dashboard={dashboardForSession(dashboard,session)} onLogout={onLogout} session={session}/></MoneyAccessContext.Provider>}/></StrictMode>);

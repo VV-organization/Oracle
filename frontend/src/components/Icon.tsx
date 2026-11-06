@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { AnimationItem } from 'lottie-web';
 import './Icon.css';
 
-export type IconName = 'home' | 'payments' | 'cards' | 'history' | 'help' | 'settings' | 'logout' | 'plus' | 'transfer' | 'copy' | 'close';
+export type IconName = 'home' | 'payments' | 'cards' | 'history' | 'help' | 'settings' | 'logout' | 'plus' | 'transfer' | 'copy' | 'close' | 'back';
 // Same 12px visible bounds and 1.75px stroke in a 16px action slot.
 const actionViewBoxes: Partial<Record<IconName, string>> = {"plus": "36.684111 36.684111 54.631778 54.631778", "transfer": "39.818739 29.095132 59.086135 59.086135"};
 const dataCache = new Map<IconName, Promise<object>>();
@@ -20,10 +20,11 @@ function loadData(name: IconName) {
 
 /** Decorative icon: the containing button/link owns the accessible label and hit area. */
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
+  const assetName = name === 'back' ? 'transfer' : name;
   const root = useRef<HTMLSpanElement>(null);
   const canvas = useRef<HTMLSpanElement>(null);
   const [playing, setPlaying] = useState(false);
-  const staticSrc = `${import.meta.env.BASE_URL}assets/iconity/${name}.svg`;
+  const staticSrc = `${import.meta.env.BASE_URL}assets/iconity/${assetName}.svg`;
 
   useEffect(() => {
     setPlaying(false);
@@ -39,7 +40,7 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
     let totalFrames = 0;
     let duration = 0;
     let loading: Promise<void> | undefined;
-    const restFrame = name === 'transfer' ? 18 : 0;
+    const restFrame = assetName === 'transfer' ? 18 : 0;
     const reset = () => {
       animation?.resetSegments(true);
       animation?.goToAndStop(restFrame, true);
@@ -64,12 +65,12 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
     const prepare = () => {
       if (animation) { play(); return; }
       if (loading) return;
-      loading = Promise.all([import('lottie-web/build/player/lottie_light'), loadData(name)]).then(([module, data]) => {
+      loading = Promise.all([import('lottie-web/build/player/lottie_light'), loadData(assetName)]).then(([module, data]) => {
         if (disposed) return;
         animation = module.default.loadAnimation({
           container: host, renderer: 'svg', loop: false, autoplay: false,
           animationData: structuredClone(data),
-          rendererSettings: { progressiveLoad: false, preserveAspectRatio: 'xMidYMid meet', viewBoxSize: actionViewBoxes[name] },
+          rendererSettings: { progressiveLoad: false, preserveAspectRatio: 'xMidYMid meet', viewBoxSize: actionViewBoxes[assetName] },
         });
         totalFrames = animation.totalFrames;
         duration = animation.getDuration(false);
@@ -109,9 +110,9 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
       document.removeEventListener('visibilitychange', visibility);
       animation?.destroy();
     };
-  }, [name]);
+  }, [name, assetName]);
 
-  return <span ref={root} className={`app-icon${playing?' is-playing':''}`} style={{width:size,height:size}} data-icon={name} data-icon-source="iconity" aria-hidden="true">
+  return <span ref={root} className={`app-icon${playing?' is-playing':''}`} style={{width:size,height:size,transform:name === 'back' ? 'rotate(-135deg)' : undefined}} data-icon={name} data-icon-source="iconity" aria-hidden="true">
     <img className="app-icon-static" src={staticSrc} alt="" width={size} height={size}/>
     <span ref={canvas} className="app-icon-animation"/>
   </span>;

@@ -1,15 +1,19 @@
-- Account-card spacing and hierarchy (5 November 2026): fiat and crypto cards have equal importance. In the cards layout, use the same responsive amount and currency-unit typography for both groups, 12px padding on every edge at every breakpoint, top-aligned identity/requisites and bottom-anchored amounts. Let remaining interior space flex around the actions; do not shrink crypto amounts independently. Preserve full numeric precision and verify the longest balance at breakpoint boundaries.
+- Account-card spacing and hierarchy (5 November 2026): fiat and crypto cards have equal importance. In the cards layout, use the same responsive amount and currency-unit typography for both groups, 12px padding on every edge at every breakpoint, top-aligned identity/requisites and bottom-anchored amounts. Distribute remaining vertical space equally between the heading, actions and amount with space-between and non-shrinking content; do not combine fixed vertical gaps, a growing actions wrapper or auto margins; do not shrink crypto amounts independently. Preserve full numeric precision and verify the longest balance at breakpoint boundaries.
 
 # Local palette and action refinement — 5 November 2026
 
 - Latest approved scope: transfer only colours and the recent-activity filter styling from the two static concepts; preserve the current layouts, typography, content and behaviour.
 - Orange selected-panel actions are two equal-width milky translucent pill buttons with icon before label, a16px gap and the existing32px panel inset. This supersedes the older separate-circle/label-below rule for this panel. Keep the mobile cards presentation and green card actions unchanged.
 
-# Theme isolation — latest rule, 5 November 2026
+# Operation semantics — 6 November 2026
+
+- Exactly four operation states: completed (green), pending (amber), unknown (neutral), failed (red). Keep unknown distinct from failure. Use shared operationPresentation and the semantic tokens documented in frontend/WALLET-HOME-2026-11-05.md. Do not invent additional status colours or equate ordinary spending with an error. Preserve status text and amount signs so colour is never the only signal.
+
+# Theme isolation — latest rule, 6 November 2026
 
 - Support ONLY green/cards and orange/columns; mixed is retired. This supersedes older mixed-theme notes below.
-- Every decorative colour must follow the selected theme, including currency stamps, transaction direction icons, incoming amounts, sidebar, language switch, links, borders, shadows, hover/focus/pressed states, empty states, dialogs and mobile overlays. Orange must contain no green tint except an explicit successful-status label/indicator. An incoming transfer or positive amount is NOT a success status: use the theme accent. Green uses green decorative accents; semantic pending/error/unknown colours retain their meaning.
-- Shared component styles must consume theme tokens. Never hardcode green as a common/default colour with incomplete orange overrides. Define both palettes explicitly; keep success tokens confined to successful-status UI. Audit both rendered variants at desktop/mobile, including hover, keyboard focus, selection, empty history and receiving dialogs, after shared colour changes. Record actual checks, not a blanket claim of coverage.
+- Every decorative colour must follow the selected theme, including currency stamps, transaction direction icons, incoming amounts, sidebar, language switch, links, borders, shadows, hover/focus/pressed states, empty states, dialogs and mobile overlays. Orange must contain no decorative green tint. Latest exception (6 November): completed incoming amounts use semantic green with + in both themes; completed outgoing amounts are neutral with −. Pending, unknown and failed amounts are neutral without a settled-movement sign. Direction icons and ledger text are neutral. Never infer settlement from incoming direction or the legacy positive flag. Green uses green decorative accents; semantic pending/error/unknown colours retain their meaning.
+- Shared component styles must consume theme tokens. Never hardcode green as a common/default colour with incomplete orange overrides. Define both palettes explicitly; keep success tokens confined to successful-status UI and confirmed credited amounts. Audit both rendered variants at desktop/mobile, including hover, keyboard focus, selection, empty history and receiving dialogs, after shared colour changes. Record actual checks, not a blanket claim of coverage.
 
 - Text links (5 November 2026): in themed variants both link text and underline are subdued/translucent at rest and fully visible on hover; underline stays1px in every state. Preserve keyboard focus visibility and text legibility.
 
@@ -62,6 +66,14 @@
 
 # OraclePay UX requirements
 
+- When starting a new sign-in or recovery attempt, clear the previous authenticated account context before proceeding. A confirmed but unfinished profile takes routing priority over any stale session. Test switching A → B, direct Home navigation, reload and storage failures; never display A's wallet inside B's onboarding.
+
+- Приёмка каждого frontend-флоу обязательна по `docs/migration/FLOW-QA.md`: Figma не доказывает корректность сценария, её обходы и пропуски нельзя переносить как готовое поведение. Проверять все известные ветки, отрицательные исходы, повторные действия, восстановление контекста и согласованность данных; успех показывать только по подтверждённому результату. Независимый QA, доказательства на текущей версии и повторная проверка исправлений обязательны. Непроверенное, заблокированное и имитированное явно отделять от работающей интеграции; не закрывать весь флоу по успешному пути или одной сборке.
+
+- Переносить целые флоу со всеми ветками, состояниями, повторными попытками, возвратами и восстановлением после перезагрузки. Не закрывать пакет по одному успешному пути или оставлять его существенные действия заглушками. Регистрация включает контекст и ограничения нового аккаунта; заявка на восстановление не равна восстановленному доступу. Перед закрытием сверять ветки источник → код → наблюдаемый результат независимым QA.
+
+- Продолжение переноса ведётся небольшими законченными сценариями по `docs/migration/AGENT-WORKFLOW.md`: основной агент — оркестратор, один исполнитель исходников, независимые QA и дизайн-лид (Impeccable). Для ограниченных подзадач использовать экономичный `gpt-6.1-sol` medium с кратким контекстом. Не запускать все роли без необходимости; не объявлять свою модель переключённой без технического подтверждения. Новые изменения пока только локальные, без push и публикации.
+
 - Local review only (5 November 2026): propose and implement further changes locally for user review. Do not commit, push, deploy, or publish them without a new explicit user request. Earlier commit/push requests do not authorize later iterations.
 
 - In every OraclePay task, use subagents: the main agent coordinates and owns the final result, and at least one subagent independently checks it. For large tasks, separate research, product logic, and UX/UI audit; for small tasks, request a brief focused check. Only one executor may edit a shared Figma file.
@@ -96,3 +108,5 @@
 - Home redesign direction (5 November 2026): the user rejected a merely colored prototype and explicitly authorized reference-led hierarchy and careful structural changes on Home only, with subtle entrance motion. The active themed implementation is `frontend/src/wallet/`; see `frontend/WALLET-HOME-2026-11-05.md`. Preserve the neutral Figma baseline separately. Do not describe themed geometry as 1:1 or expand to other screens before the Home direction is reviewed. Keep only the active account colored, context actions discoverable on mobile, equal card sizes, and reduced motion.
 
 - Supported visual variants (5 November 2026): only green/cards and orange/columns. The user rejected and discontinued the green–orange mixed version. Do not restore or extend it; legacy mixed URLs resolve to the matching supported theme. Entrance motion must be visible when objects first enter the viewport, including after scrolling, without replaying existing objects on account selection; honor reduced motion and keyboard focus.
+
+- Unified access (6 November 2026, user-approved): one phone/email entry → OTP → existing registered account Home or new-contact profile completion (personal/business). A separate expiring confirmation gates profile setup; a draft is never proof of contact ownership. Preserve drafts per confirmed contact, invalidate confirmation on contact change/logout/recovery, treat lookup failures as retryable errors rather than new users, and never auto-link phone/email. Unknown contacts must not enter the seeded demo wallet. OTP is not KYC/KYB; new profiles retain zero balances and verification restrictions. See `docs/migration/batches/04c-unified-entry.md`; browser-only authentication remains a simulation.

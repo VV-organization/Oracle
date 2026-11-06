@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import '@fontsource-variable/manrope';
+import type { ReactNode } from 'react';
+import { useMoneyAccess } from '../auth/AccessContext';
 import type { Account, Currency, Dashboard, Operation } from '../domain';
-import { filterOperations, formatAmount } from '../domain';
+import { filterOperations, formatAmount, operationPresentation } from '../domain';
 import { catalogs, type Locale } from '../locales';
 import { Icon } from '../components/Icon';
 import { BrandLogo } from '../components/BrandLogo';
@@ -9,7 +11,7 @@ import './wallet.css';
 import { walletCopy as words } from './copy';
 
 type Props = {
-  dashboard: Dashboard; locale: Locale; layout: 'cards'|'columns'; selected: Currency|null;
+  restriction?: ReactNode; accountType?: 'personal'|'business'; dashboard: Dashboard; locale: Locale; layout: 'cards'|'columns'; selected: Currency|null;
   onSelect: (currency: Currency)=>void; onReset: ()=>void;
   onOpen: (action:string,currency?:Currency)=>void;
 };
@@ -26,6 +28,8 @@ function Identity({account,locale,showStamp=true}:{account:Account;locale:Locale
  return <span className="wallet-identity">{showStamp&&<span className="wallet-currency-stamp" aria-hidden="true">{account.currency}</span>}<span className="wallet-identity-copy"><strong>{account.currency}</strong><span>{catalogs[locale].currency[account.currency]}</span></span></span>;
 }
 function Actions({account,locale,onOpen}:{account:Account;locale:Locale;onOpen:Props['onOpen']}) {
+ const allowed=useMoneyAccess();
+ if(!allowed)return null;
  return <div className="wallet-actions">{(['fund','transfer'] as const).map(action=><button key={action} onClick={()=>onOpen(action,account.currency)} aria-label={`${catalogs[locale][action]} · ${account.currency}`}><span className="wallet-action-circle"><Icon name={action==='fund'?'plus':'transfer'} size={18}/></span><span>{catalogs[locale][action]}</span></button>)}</div>;
 }
 function AccountTile({account,locale,selected,onSelect,onOpen}:{account:Account;locale:Locale;selected:boolean;onSelect:()=>void;onOpen:Props['onOpen']}) {
@@ -40,6 +44,50 @@ function AccountTile({account,locale,selected,onSelect,onOpen}:{account:Account;
    <p className="wallet-balance"><Amount account={account} locale={locale}/></p>
  </article>;
 }
+/** On phones the same cards form an explicit, keyboard-accessible account rail. */
+function AccountGroup({accounts,kind,locale,selected,onSelect,onOpen}:{accounts:Account[];kind:'fiat'|'crypto';locale:Locale;selected:Currency|null;onSelect:Props['onSelect'];onOpen:Props['onOpen']}) {
+ const rail=useRef<HTMLDivElement>(null);
+ const [position,setPosition]=useState(0);
+ const t=catalogs[locale],w=words[locale];
+ useEffect(()=>{
+  const element=rail.current;
+  if(!element)return;
+  const update=()=>{
+   const first=element.firstElementChild as HTMLElement|null;
+   const step=(first?.offsetWidth??1)+12;
+   setPosition(Math.min(accounts.length-1,Math.max(0,Math.round(element.scrollLeft/step))));
+  };
+  element.addEventListener('scroll',update,{passive:true});
+  const resize=new ResizeObserver(update);resize.observe(element);update();
+  return ()=>{element.removeEventListener('scroll',update);resize.disconnect();};
+ },[accounts.length]);
+ useLayoutEffect(()=>{
+  const phone=matchMedia('(max-width: 600px)');
+  const revealSelected=()=>{
+   const element=rail.current;
+   const active=element?.querySelector<HTMLElement>('.is-selected');
+   if(!phone.matches||!element||!active)return;
+   const left=active.getBoundingClientRect().left-element.getBoundingClientRect().left+element.scrollLeft;
+   element.scrollTo({left,behavior:'instant'});
+  };
+  revealSelected();phone.addEventListener('change',revealSelected);
+  return ()=>phone.removeEventListener('change',revealSelected);
+ },[selected]);
+ function move(direction:number,keyboard:boolean){
+  const element=rail.current;
+  if(!element)return;
+  const step=(element.firstElementChild as HTMLElement).offsetWidth+12;
+  const next=Math.max(0,Math.min(accounts.length-1,position+direction));
+  element.scrollTo({left:next*step,behavior:keyboard||matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+  if(keyboard)(element.children[next] as HTMLElement).querySelector<HTMLButtonElement>('.wallet-account-select')?.focus({preventScroll:true});
+ }
+ return <section className={`wallet-group ${kind}`} aria-labelledby={`wallet-${kind}`}>
+  <div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2>
+   <div className="wallet-rail-controls"><span aria-live="polite">{position+1} / {accounts.length}</span><button aria-label={`${w.previousAccount} · ${kind==='fiat'?t.money:t.crypto}`} disabled={position===0} onClick={event=>move(-1,event.detail===0)}><Icon name="transfer" size={16}/></button><button aria-label={`${w.nextAccount} · ${kind==='fiat'?t.money:t.crypto}`} disabled={position===accounts.length-1} onClick={event=>move(1,event.detail===0)}><Icon name="transfer" size={16}/></button></div>
+  </div>
+  <div ref={rail} className="wallet-card-grid">{accounts.map(a=><AccountTile key={a.currency} account={a} locale={locale} selected={selected===a.currency} onSelect={()=>onSelect(a.currency)} onOpen={onOpen}/>)}</div>
+ </section>;
+}
 function Ledger({operations,selected,locale,onReset,onOpen}:{operations:Operation[];selected:Currency|null;locale:Locale;onReset:()=>void;onOpen:Props['onOpen']}) {
  const t=catalogs[locale],w=words[locale];
  return <section className="wallet-ledger" aria-labelledby="wallet-history-title">
@@ -47,21 +95,22 @@ function Ledger({operations,selected,locale,onReset,onOpen}:{operations:Operatio
   <div className="wallet-ledger-surface">
    <div className="wallet-ledger-head" aria-hidden="true"><span>{t.operation}</span><span>{t.date}</span><span>{t.status}</span><span>{t.amount}</span></div>
    {operations.length?operations.map(op=>{
-    const incoming=op.kind!=='transfer';
+    const presentation=operationPresentation(op);
+    const incoming=presentation.incoming;
     const primary=op.kind==='transfer'?op.recipient:op.kind==='receiving'?`${t.receiving} ${op.currency}`:t.funding;
     const secondary=op.showId?op.id:op.kind==='transfer'?w.outgoing:w.incoming;
     const date=new Intl.DateTimeFormat(locale==='ru'?'ru-RU':'en-US',{day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(`${op.date.slice(0,10)}T00:00:00Z`));
     return <button className="wallet-transaction" key={op.id} onClick={()=>onOpen(`operation:${op.id}`,op.currency)}>
      <span className="wallet-transaction-identity"><span className={`wallet-direction${incoming?' incoming':''}`}><Icon name="transfer" size={18}/></span><span className="wallet-operation-copy"><strong>{primary}</strong><span>{secondary}</span></span></span>
      <span className="wallet-date">{date}<span>{op.date.slice(11,16)} · {op.currency}</span></span>
-     <span className="wallet-status" data-status={op.status}><span className="wallet-status-dot"/>{op.status==='completed'&&op.kind==='transfer'?t.executed:t[op.status]}</span>
-     <span className="wallet-operation-amount" data-incoming={op.positive}>{op.positive?'+':''}<Amount account={op} locale={locale}/></span>
+     <span className="wallet-status" data-status={op.status}><span className="wallet-status-dot"/>{t[presentation.statusLabel]}</span>
+     <span className="wallet-operation-amount" data-tone={presentation.amountTone}>{presentation.sign}<Amount account={op} locale={locale}/></span>
     </button>;
    }):<div className="wallet-empty" role="status"><span className="wallet-direction"><Icon name="history" size={24}/></span><strong>{t.empty}</strong><p>{t.emptyHelp}</p></div>}
   </div>
  </section>;
 }
-export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onReset,onOpen}:Props){
+export function WalletDashboard({restriction,accountType='personal',dashboard,locale,layout,selected,onSelect,onReset,onOpen}:Props){
  const t=catalogs[locale],w=words[locale];
  const compact=useSyncExternalStore(subscribeCompact,getCompact,()=>false);
  const presentation=compact?'cards':layout;
@@ -76,7 +125,7 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
   const settle=(node:HTMLElement)=>{node.dataset.walletReveal='settled';};
   const observer=new IntersectionObserver(entries=>{
    entries.forEach(entry=>{if(entry.isIntersecting){reveal(entry.target as HTMLElement);observer.unobserve(entry.target);}});
-  },{threshold:0.08});
+  },{threshold:0.01});
   targets.forEach(node=>{
    if(media.matches){settle(node);return;}
    if(node.dataset.walletReveal==='visible'||node.dataset.walletReveal==='settled')return;
@@ -122,7 +171,6 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
    else menuRef.current?.querySelector<HTMLButtonElement>('[aria-current="page"]')?.focus();
   };
  },[menuOpen,compact]);
- const count=(kind:'fiat'|'crypto')=>dashboard.accounts.filter(a=>a.kind===kind).length;
  const account=dashboard.accounts.find(item=>item.currency===selected);
  const operations=filterOperations(dashboard.operations,selected).slice(0,4);
  const ledger=<Ledger operations={operations} selected={selected} locale={locale} onReset={onReset} onOpen={onOpen}/>;
@@ -130,18 +178,18 @@ export function WalletDashboard({dashboard,locale,layout,selected,onSelect,onRes
  function changeLocale(next:Locale){const url=new URL(location.href);url.searchParams.set('lang',next);location.assign(url.href);}
  return <div ref={shellRef} className={`wallet-shell wallet-layout-${presentation}`}>
   <aside ref={menuRef} id="wallet-navigation" className={`wallet-sidebar${menuOpen?' is-open':''}`}>
-   <div className="wallet-brand-block"><BrandLogo className="wallet-brand" /><p>{t.wallet}</p></div>
+   <div className="wallet-brand-block"><BrandLogo className="wallet-brand" /><p>{accountType === 'business' ? t.businessWallet : t.wallet}</p></div>
    <button className="wallet-mobile-close" onClick={()=>setMenuOpen(false)} aria-label={w.closeMenu}><Icon name="close"/></button>
    <nav className="wallet-nav" aria-label={locale==='ru'?'Основная навигация':'Main navigation'}>{nav.map((item,index)=><button className={`wallet-nav-item${item==='home'?' active':''}${index===4?' wallet-nav-secondary':''}`} key={item} aria-current={item==='home'?'page':undefined} onClick={()=>go(item)}><Icon name={item} size={19}/><span>{t[item]}</span></button>)}</nav>
    <div className="wallet-sidebar-bottom"><div className="wallet-languages" role="group" aria-label={w.language}>{(['ru','en'] as const).map(lang=><button key={lang} aria-pressed={locale===lang} onClick={()=>changeLocale(lang)}>{lang.toUpperCase()}</button>)}</div><button className="wallet-nav-item" onClick={()=>onOpen('logout')}><Icon name="logout" size={19}/><span>{t.logout}</span></button></div>
   </aside>
   {menuOpen&&<button className="wallet-menu-shade" aria-label={w.closeMenu} onClick={()=>setMenuOpen(false)}/>}
   <div className="wallet-workspace" inert={menuOpen&&compact}>
-   <header className="wallet-topbar"><button ref={menuToggleRef} aria-controls="wallet-navigation" className="wallet-menu-toggle" aria-expanded={menuOpen} onClick={()=>setMenuOpen(!menuOpen)}>{w.menu}</button><span className="wallet-location">{t.home}<span>/</span>{w.overview}</span><span className="wallet-owner"><span className="wallet-avatar" aria-hidden="true">{dashboard.owner.split(' ').map(s=>s[0]).slice(0,2).join('')}</span><span>{dashboard.owner}</span></span></header>
+   <header className="wallet-topbar"><button ref={menuToggleRef} aria-controls="wallet-navigation" className="wallet-menu-toggle" aria-expanded={menuOpen} onClick={()=>setMenuOpen(!menuOpen)}>{w.menu}</button><span className="wallet-location">{t.home}</span><span className="wallet-owner"><span className="wallet-avatar" aria-hidden="true">{dashboard.owner.split(' ').map(s=>s[0]).slice(0,2).join('')}</span><span>{dashboard.owner}</span></span></header>
    <main className="wallet-main">
-    <div className="wallet-page-heading"><div><h1>{w.title}</h1><p>{w.subtitle}</p></div><span className="wallet-account-count">{locale==='ru'?`${count('fiat')} валюты · ${count('crypto')} криптоактивов`:`${count('fiat')} currencies · ${count('crypto')} crypto assets`}</span></div>
-    {presentation==='cards'?<><div className="wallet-account-groups">{(['fiat','crypto'] as const).map(kind=><section className={`wallet-group ${kind}`} key={kind} aria-labelledby={`wallet-${kind}`}><div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2><span>{String(count(kind)).padStart(2,'0')}</span></div><div className="wallet-card-grid">{dashboard.accounts.filter(a=>a.kind===kind).map(a=><AccountTile key={a.currency} account={a} locale={locale} selected={selected===a.currency} onSelect={()=>onSelect(a.currency)} onOpen={onOpen}/>)}</div></section>)}</div>{ledger}</>:
-     <div className="wallet-columns" data-selected={Boolean(account)}><div className="wallet-account-rail">{(['fiat','crypto'] as const).map(kind=><section className={`wallet-rail-group ${kind}`} key={kind} aria-labelledby={`wallet-${kind}`}><div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2><span>{String(count(kind)).padStart(2,'0')}</span></div><div className="wallet-rail-list">{dashboard.accounts.filter(a=>a.kind===kind).map(a=><button className={`wallet-rail-account${selected===a.currency?' is-selected':''}`} key={a.currency} aria-label={`${t.selectedHistory} · ${a.currency}`} aria-pressed={selected===a.currency} onClick={()=>onSelect(a.currency)}><Identity account={a} locale={locale}/><span className="wallet-rail-balance"><Amount account={a} locale={locale}/></span></button>)}</div></section>)}</div>
+    <div className="wallet-page-heading"><h1>{w.title}</h1></div>{restriction}
+    {presentation==='cards'?<><div className="wallet-account-groups">{(['fiat','crypto'] as const).map(kind=><AccountGroup key={kind} kind={kind} accounts={dashboard.accounts.filter(a=>a.kind===kind)} locale={locale} selected={selected} onSelect={onSelect} onOpen={onOpen}/>)}</div>{ledger}</>:
+     <div className="wallet-columns" data-selected={Boolean(account)}><div className="wallet-account-rail">{(['fiat','crypto'] as const).map(kind=><section className={`wallet-rail-group ${kind}`} key={kind} aria-labelledby={`wallet-${kind}`}><div className="wallet-group-heading"><h2 id={`wallet-${kind}`}>{kind==='fiat'?t.money:t.crypto}</h2></div><div className="wallet-rail-list">{dashboard.accounts.filter(a=>a.kind===kind).map(a=><button className={`wallet-rail-account${selected===a.currency?' is-selected':''}`} key={a.currency} aria-label={`${t.selectedHistory} · ${a.currency}`} aria-pressed={selected===a.currency} onClick={()=>onSelect(a.currency)}><Identity account={a} locale={locale}/><span className="wallet-rail-balance"><Amount account={a} locale={locale}/></span></button>)}</div></section>)}</div>
       <div className="wallet-detail-column">{account&&<section className="wallet-selected-panel"><div className="wallet-panel-heading" key={`heading-${account.currency}`}><Identity account={account} locale={locale}/><button className="wallet-link" onClick={()=>onOpen('receiving-details',account.currency)}>{account.kind==='fiat'?t.details:t.address}</button></div><div className="wallet-panel-balance" key={`balance-${account.currency}`}><span>{w.balance}</span><p><Amount account={account} locale={locale}/></p></div><Actions key={account.currency} account={account} locale={locale} onOpen={onOpen}/></section>}{ledger}</div>
      </div>}
    </main>

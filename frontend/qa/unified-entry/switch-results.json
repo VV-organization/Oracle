@@ -1,0 +1,12 @@
+[
+  "green starting B invalidates A session",
+  "green direct Home preserves B profile gate",
+  "green reload preserves B context without A",
+  "green completion enters B only",
+  "green failed invalidation blocks new OTP",
+  "orange starting B invalidates A session",
+  "orange direct Home preserves B profile gate",
+  "orange reload preserves B context without A",
+  "orange completion enters B only",
+  "orange failed invalidation blocks new OTP"
+]

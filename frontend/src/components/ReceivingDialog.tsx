@@ -6,11 +6,12 @@ import { receivingDetails, receivingCopy, bankFields, bankClipboardText } from '
 import { Icon } from './Icon';
 import './ReceivingDialog.css';
 
-export function ReceivingDialog({currency,owner,locale,onDismiss}:{currency:Currency;owner:string;locale:Locale;onDismiss:()=>void}) {
+export function ReceivingDialog({currency,owner,locale,onDismiss,issued=true}:{issued?:boolean;currency:Currency;owner:string;locale:Locale;onDismiss:()=>void}) {
   const dialog=useRef<HTMLDialogElement>(null);
   const request=useRef(0);
   const [feedback,setFeedback]=useState<{key:string;error:boolean}|null>(null);
-  const details=receivingDetails[currency];
+  const details = issued ? receivingDetails[currency] : { kind: 'unavailable' as const };
+  const crypto = !['EUR','USD','GBP','CHF'].includes(currency);
   const t=receivingCopy[locale];
   const asset=`${currency} · ${catalogs[locale].currency[currency]}`;
 
@@ -49,7 +50,7 @@ export function ReceivingDialog({currency,owner,locale,onDismiss}:{currency:Curr
     if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
     else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   }}>
-    <div className="receiving-header"><h2 id="receiving-title">{details.kind==='crypto'?t.cryptoTitle:t.bankTitle}</h2><button className="receiving-icon-button" autoFocus aria-label={t.close} onClick={onDismiss}><Icon name="close" size={24}/></button></div>
+    <div className="receiving-header"><h2 id="receiving-title">{crypto?t.cryptoTitle:t.bankTitle}</h2><button className="receiving-icon-button" autoFocus aria-label={t.close} onClick={onDismiss}><Icon name="close" size={24}/></button></div>
     {details.kind==='crypto'?<div className="receiving-crypto" data-node-id="2734:985">
       <div className="receiving-network"><span>{t.network}</span><span>{details.network}</span></div>
       <div className="receiving-address-group"><p className="receiving-asset">{asset}</p><div className="receiving-address-row"><p>{details.address}</p>{copyControl('address',details.address,catalogs[locale].address)}</div></div>
@@ -57,7 +58,7 @@ export function ReceivingDialog({currency,owner,locale,onDismiss}:{currency:Curr
       <p className="receiving-notice">{t.networkNotice}</p>
     </div>:<div className="receiving-bank" data-node-id="2734:966">
       <p className="receiving-currency">{asset}</p>
-      {details.kind==='unavailable'?<p className="receiving-unavailable">{t.unavailable}</p>:<>
+      {details.kind==='unavailable'?<p className="receiving-unavailable">{issued ? t.unavailable : t.unissued}</p>:<>
         {bankFields(currency,details,owner,locale).map(row=><div className="receiving-bank-row" key={row.key}>
           <span className="receiving-label">{row.label}</span><span className="receiving-value">{row.value}</span>{row.copy&&copyControl(row.key,row.value,row.label)}
         </div>)}

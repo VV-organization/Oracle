@@ -15,6 +15,7 @@ All current slots, including both dashboard compositions and the historical comp
 | logout | General / log_out | 0 |
 | plus | General / Add_Circle, circle removed per 5 November request | 0 |
 | transfer | Arrows / arrow_right_Up | 18 |
+| back | Same arrow_right_Up, rotated −135° to point left | 18 |
 | close | General / Close_Circle | 0 |
 | copy | General / copy_1 | 0 |
 

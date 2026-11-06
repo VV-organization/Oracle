@@ -1,0 +1,23 @@
+{
+  "passed": 18,
+  "checks": [
+    "green resend restarts countdown",
+    "green expired OTP never opens profile",
+    "green fresh OTP after expiry opens profile",
+    "green code reload cannot bypass challenge",
+    "green recovery receipt gives no wallet session",
+    "green corrupt lookup is error not signup",
+    "green lookup retry preserves challenge",
+    "green session write failure never opens wallet",
+    "green inaccessible registry fails closed without crash",
+    "orange resend restarts countdown",
+    "orange expired OTP never opens profile",
+    "orange fresh OTP after expiry opens profile",
+    "orange code reload cannot bypass challenge",
+    "orange recovery receipt gives no wallet session",
+    "orange corrupt lookup is error not signup",
+    "orange lookup retry preserves challenge",
+    "orange session write failure never opens wallet",
+    "orange inaccessible registry fails closed without crash"
+  ]
+}

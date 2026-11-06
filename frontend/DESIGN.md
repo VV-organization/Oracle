@@ -1,4 +1,4 @@
-> Latest colour rule: decorative colours follow the active theme everywhere. Orange permits green only in explicit successful-status UI; incoming amounts/icons are theme accents. See WALLET-HOME-2026-11-05.md, Theme isolation. This overrides historical mixed-theme or palette notes below.
+> Latest colour rule (6 November): decorative accents follow the selected theme. Ledger text and direction icons are neutral. Confirmed incoming amounts use semantic green and + in both themes; completed outgoing amounts use neutral −. Four operation states only: completed, pending, unknown, failed. See WALLET-HOME-2026-11-05.md, Operation semantics; this supersedes older theme-isolation wording.
 
 > Active variants: green/cards and orange/columns only. Mixed was rejected and removed on 5 November 2026; mentions below are historical.
 
@@ -91,3 +91,7 @@ Inter с локальной кириллицей сохранён. Заголо�
 Просмотрены оба RU-экрана 1440×1000; EN-подписи проверены на переполнение. Проверены выбор BTC, сброс Главной, пустая история CHF, адрес и Escape. Независимый дизайн-ревьюер повторно просмотрел оба чётких кадра после исправлений. Контраст — `docs/migration/evidence/dashboard/contrast-v3.json`; расчёт не заменяет визуальную приёмку.
 
 Результат локальный. Полная мобильная композиция, остальные переходы и backend не готовы. Приложение сохраняет desktop min-width 1440px. Никакого независимого пользовательского теста не проводилось.
+
+### Основные кнопки доступа — 6 ноября 2026
+
+«Получить код» и «Подтвердить» используют материал плашек через общие `--pulse-field`, `--pulse-ink`, `--pulse-rim`: зелёный в зелёной теме, оранжевый в оранжевой. Текст тёмный для читаемости. Светлый внутренний блик, короткий hover и press, без изменения геометрии; disabled не реагирует на hover/press, reduced motion отключает переходы и масштабирование. Вторичные текстовые действия сохраняют подчинённый вид. Изменение локальное.

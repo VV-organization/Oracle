@@ -1,0 +1,8 @@
+transition_id,from_node_id,target_node_id,action,package,status,limitation
+04a1-register,34:78,34:105,Создать аккаунт,04б,superseded-by-approved-04c,Separate signup entry removed by user approval; contact → OTP → existing Home or confirmed new profile. See 04c-unified-entry.md. Local simulation only.
+04a1-recover,34:78,34:175,Нет доступа к телефону или почте,04а,local-verified,Request flow implemented in 04a2; local adapter only; owner verification and email delivery require backend
+04a1-recover-code,34:150,34:175,Нет доступа к телефону или почте,04а,local-verified,Request flow implemented in 04a2; local adapter only; owner verification and email delivery require backend
+04a1-server,34:150,,Verify OTP and establish server session,backend-contract,open,Local fixture only; delivery limits expiry and account restrictions require backend contract
+04b-verification,34:262,,Начать проверку,04г,open,Disabled with visible unavailable state; provider and full KYC/KYB flow not implemented
+04b-server,34:150,,Create account and establish trusted session,backend-contract,open,Local registry and OTP fixture only; server authorization and identity verification required
+04c-unified-entry,34:78,34:150,Contact → OTP → existing Home or new profile,04c,local-verified,User-approved reorder; profile follows confirmation. Browser/service checks documented in 04c; server auth/delivery and KYC remain open.
